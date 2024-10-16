@@ -31,6 +31,7 @@ namespace Car_rental
             var Initialize = new DatabaseInitializer(connectionString: connectionString);
             Initialize.Initialize();
 
+
             //builder.Services.AddCors(options =>
             //{
             //    options.AddDefaultPolicy(policy =>
