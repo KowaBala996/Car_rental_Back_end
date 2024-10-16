@@ -57,7 +57,7 @@ namespace Car_rental.Repository
                     {
                         return new CustomerDTO
                         {
-                            Id = reader.GetInt32(0),
+                            Id = reader.GetString(0),
                             Name = reader.GetString(1),
                             Phone = reader.GetString(2),
                             Email = reader.GetString(3),
@@ -89,7 +89,7 @@ namespace Car_rental.Repository
                     ProofIdNumber = @proofIdNumber, ProfileStatus = @profileStatus 
                     WHERE Id = @id";
 
-                command.Parameters.AddWithValue("@id", id);
+                command.Parameters.AddWithValue("@id", requestCustomerDto.Id);
                 command.Parameters.AddWithValue("@name", requestCustomerDto.Name);
                 command.Parameters.AddWithValue("@phone", requestCustomerDto.Phone);
                 command.Parameters.AddWithValue("@email", requestCustomerDto.Email);

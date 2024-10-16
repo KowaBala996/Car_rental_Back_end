@@ -4,7 +4,7 @@ namespace Car_rental.Models.ResposeModel
 {
     public class CustomerDTO
     {
-        public int Id { get; set; } // Primary Key
+        public string Id { get; set; } // Primary Key
         public string Name { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }

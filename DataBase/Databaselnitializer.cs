@@ -37,7 +37,7 @@ namespace Car_rental.DataBase
                     ('Car_01', 'Toyota', 'SUV', 'Highlander', 'Automatic', 'Petrol', 7, 15.5, '/images/cars/toyota_highlander.jpg', '2024-10-01', '2024-12-31');
 
                     CREATE TABLE IF NOT EXISTS Customers(
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                        Id NVARCHAR(50) PRIMARY KEY AUTOINCREMENT, 
                         Name NVARCHAR(50) NOT NULL, 
                         Phone NVARCHAR(15) NOT NULL, 
                         Email NVARCHAR(50) NOT NULL, 
