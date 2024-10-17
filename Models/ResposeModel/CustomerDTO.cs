@@ -14,6 +14,6 @@ namespace Car_rental.Models.ResposeModel
         public string DrivingLicenseNumber { get; set; }
         public string FrontImagePath { get; set; }
         public string ProofIdNumber { get; set; }
-        public string profileStatus { get; set; }
+        public string ProfileStatus { get; set; }
     }
 }

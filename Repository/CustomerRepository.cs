@@ -22,27 +22,22 @@ namespace Car_rental.Repository
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    INSERT INTO Customers (Name, Phone, Email, Nic, Address, PostalCode, 
-                    DrivingLicenseNumber, FrontImagePath, ProofIdNumber, ProfileStatus) 
-                    VALUES (@name, @phone, @email, @nic, @address, @postalCode, 
-                    @drivingLicenseNumber, @frontImagePath, @proofIdNumber, @profileStatus)";
+                    INSERT INTO Customers (Id,Name, Phone, Email, Nic,Password) 
+                    VALUES (@id,@name, @phone, @email, @nic,@password)";
 
+                command.Parameters.AddWithValue("@id", requestCustomerDto.id);
                 command.Parameters.AddWithValue("@name", requestCustomerDto.name);
                 command.Parameters.AddWithValue("@phone", requestCustomerDto.phone);
                 command.Parameters.AddWithValue("@email", requestCustomerDto.email);
                 command.Parameters.AddWithValue("@nic", requestCustomerDto.nic);
-                command.Parameters.AddWithValue("@address", requestCustomerDto.address);
-                command.Parameters.AddWithValue("@postalCode", requestCustomerDto.postalCode);
-                command.Parameters.AddWithValue("@drivingLicenseNumber", requestCustomerDto.drivingLicenseNumber);
-                command.Parameters.AddWithValue("@frontImagePath", requestCustomerDto.FrontImagePath);
-                command.Parameters.AddWithValue("@proofIdNumber", requestCustomerDto.proofIdNumber);
-                command.Parameters.AddWithValue("@profileStatus", requestCustomerDto.profileStatus);
+                command.Parameters.AddWithValue("@password", requestCustomerDto.password);
+               
 
                 command.ExecuteNonQuery();
             }
         }
 
-        public CustomerDTO GetCustomerById(int nic)
+        public CustomerDTO GetCustomerById(string nic)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
@@ -67,45 +62,75 @@ namespace Car_rental.Repository
                             DrivingLicenseNumber = reader.GetString(7),
                             FrontImagePath = reader.GetString(8),
                             ProofIdNumber = reader.GetString(10),
-                            profileStatus = reader.GetString(11)
+                            ProfileStatus = reader.GetString(11)
                         };
                     }
                     return null; // or throw an exception if not found
                 }
             }
         }
+        public List<CustomerDTO> GetAllCustomers()
+        {
+            var customers = new List<CustomerDTO>();
 
-        public void UpdateCustomer(int id, RequestCustomerDTO requestCustomerDto)
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT * FROM Customers";
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var customer = new CustomerDTO
+                        {
+                            Id = reader.GetString(0),
+                            Name = reader.GetString(1),
+                            Phone = reader.GetString(2),
+                            Email = reader.GetString(3),
+                            Nic = reader.GetString(4),
+                            Address = reader.GetString(5),
+                            PostalCode = reader.GetString(6),
+                            DrivingLicenseNumber = reader.GetString(7),
+                            FrontImagePath = reader.IsDBNull(8) ? null : reader.GetString(8),
+                            ProofIdNumber = reader.GetString(9),
+                            ProfileStatus = reader.GetString(10)
+                        };
+
+                        customers.Add(customer);
+                    }
+                }
+            }
+
+            return customers;
+        }
+
+        public void UpdateCustomer(CustomerUpdateDTO requestCustomerDto)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    UPDATE Customers SET Name = @name, Phone = @phone, Email = @email, 
-                    Nic = @nic, Address = @address, PostalCode = @postalCode, 
+                    UPDATE Customers SET Address = @address, PostalCode = @postalCode, 
                     DrivingLicenseNumber = @drivingLicenseNumber, 
                     FrontImagePath = @frontImagePath,  
                     ProofIdNumber = @proofIdNumber, ProfileStatus = @profileStatus 
                     WHERE Id = @id";
-
-                command.Parameters.AddWithValue("@id", requestCustomerDto.Id);
-                command.Parameters.AddWithValue("@name", requestCustomerDto.Name);
-                command.Parameters.AddWithValue("@phone", requestCustomerDto.Phone);
-                command.Parameters.AddWithValue("@email", requestCustomerDto.Email);
-                command.Parameters.AddWithValue("@nic", requestCustomerDto.Nic);
                 command.Parameters.AddWithValue("@address", requestCustomerDto.Address);
                 command.Parameters.AddWithValue("@postalCode", requestCustomerDto.PostalCode);
                 command.Parameters.AddWithValue("@drivingLicenseNumber", requestCustomerDto.DrivingLicenseNumber);
                 command.Parameters.AddWithValue("@frontImagePath", requestCustomerDto.FrontImagePath);
                 command.Parameters.AddWithValue("@proofIdNumber", requestCustomerDto.ProofIdNumber);
-                command.Parameters.AddWithValue("@profileStatus", requestCustomerDto.ProfileStatus.ToString());
+                command.Parameters.AddWithValue("@profileStatus", requestCustomerDto.ProfileStatus);
+                command.Parameters.AddWithValue("@id", requestCustomerDto.Id);
 
                 command.ExecuteNonQuery();
             }
         }
 
-        public void DeleteCustomer(int id)
+        public void DeleteCustomer(string id)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
@@ -117,6 +142,5 @@ namespace Car_rental.Repository
             }
         }
 
-      
-    }
+    }   
 }

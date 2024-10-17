@@ -37,27 +37,27 @@ namespace Car_rental.DataBase
                     ('Car_01', 'Toyota', 'SUV', 'Highlander', 'Automatic', 'Petrol', 7, 15.5, '/images/cars/toyota_highlander.jpg', '2024-10-01', '2024-12-31');
 
                     CREATE TABLE IF NOT EXISTS Customers(
-                        Id NVARCHAR(50) PRIMARY KEY AUTOINCREMENT, 
+                        Id NVARCHAR(50) PRIMARY KEY , 
                         Name NVARCHAR(50) NOT NULL, 
                         Phone NVARCHAR(15) NOT NULL, 
                         Email NVARCHAR(50) NOT NULL, 
-                        Nic INTEGER NOT NULL, 
+                        Nic NVARCHAR(50) NOT NULL, 
                         Password NVARCHAR(50) NOT NULL, 
-                        Address NVARCHAR(100) NOT NULL, 
-                        PostalCode NVARCHAR(10) NOT NULL, 
-                        DrivingLicenseNumber NVARCHAR(20) NOT NULL, 
+                        Address NVARCHAR(100)  NULL, 
+                        PostalCode NVARCHAR(10)  NULL, 
+                        DrivingLicenseNumber NVARCHAR(20)  NULL, 
                         FrontImagePath NVARCHAR(100) NULL, 
-                        ProofIdNumber NVARCHAR(20) NOT NULL, 
-                        ProfileStatus NVARCHAR(10) NOT NULL
+                        ProofIdNumber NVARCHAR(20)  NULL, 
+                        ProfileStatus NVARCHAR(10)  NULL
                     );
 
-                    INSERT OR IGNORE INTO Customers (Name, Phone, Email, Nic, Password, Address, PostalCode, DrivingLicenseNumber, FrontImagePath, BackImagePath, ProofIdNumber, ProfileStatus) 
+                    INSERT OR IGNORE INTO Customers (Id, Name, Phone, Email, Nic, Password, Address, PostalCode, DrivingLicenseNumber, FrontImagePath, ProofIdNumber, ProfileStatus) 
                     VALUES
-                   ('John Doe', '1234567890', 'john.doe@example.com', '1234567', 'password123', '123 Main St, City', '12345', 'DL123456', '/images/customers/front.jpg', '/images/customers/back.jpg', 'PID123456', 'VERIFIED');
+                    ('CUST-001', 'John Doe', '1234567890', 'john.doe@example.com', '1234567', 'password123', '123 Main St, City', '12345', 'DL123456', '/images/customers/front.jpg', 'PID123456', 'VERIFIED');
 
                     CREATE TABLE IF NOT EXISTS Bookings(
                         BookingId NVARCHAR(50) PRIMARY KEY, 
-                        CustomerId INTEGER NOT NULL, 
+                        CustomerId NVARCHAR(50) NOT NULL, 
                         CarId NVARCHAR(50) NOT NULL, 
                         StartDate DATE NOT NULL, 
                         EndDate DATE NOT NULL, 
@@ -70,7 +70,7 @@ namespace Car_rental.DataBase
 
                     INSERT OR IGNORE INTO Bookings (BookingId, CustomerId, CarId, StartDate, EndDate, TotalPrice, Status, CreatedDate) 
                     VALUES
-                    ('BK-0001', 1, 'Car_01', '2024-10-10', '2024-10-12', 31.0, 'Confirmed', DATE('now'));
+                    ('BK-0001', 'CUST-001', 'Car_01', '2024-10-10', '2024-10-12', 31.0, 'Confirmed', DATE('now'));
 
                     CREATE TABLE IF NOT EXISTS BookingPayments(
                         PaymentId NVARCHAR(50) PRIMARY KEY, 

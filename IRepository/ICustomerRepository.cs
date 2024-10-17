@@ -7,9 +7,11 @@ namespace Car_rental.IRepository
     public interface ICustomerRepository
     {
         void AddCustomer(Customer requestCustomerDto);
-        CustomerDTO GetCustomerById(int nic);
-        void UpdateCustomer(int id, RequestCustomerDTO requestCustomerDto);
-        void DeleteCustomer(int id);
-        
+        CustomerDTO GetCustomerById(string nic);
+        void UpdateCustomer(CustomerUpdateDTO updateDetails);
+        void DeleteCustomer(string id);
+        List<CustomerDTO> GetAllCustomers();
+
+
     }
 }

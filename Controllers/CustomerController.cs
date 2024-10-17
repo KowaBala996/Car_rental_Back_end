@@ -11,8 +11,8 @@ namespace Car_rental.Controllers
     [Route("api/[controller]")]
     public class CustomerController : Controller
     {
-            private readonly ICustomerRepository _customerRepository;
-            private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ICustomerRepository _customerRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public CustomerController(ICustomerRepository customerRepository, IWebHostEnvironment webHostEnvironment)
         {
@@ -20,28 +20,67 @@ namespace Car_rental.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        [HttpPost]
-            public async Task<IActionResult> AddCustomer([FromForm] RequestCustomerDTO requestCustomerDto)
+        [HttpPost("Add-Customer")]
+        public async Task<IActionResult> AddCustomer([FromForm] RequestCustomerDTO requestCustomerDto)
+        {
+            if (requestCustomerDto == null)
             {
-                if (requestCustomerDto == null)
-                {
-                    return BadRequest("Invalid customer data.");
-                }
+                return BadRequest("Invalid customer data.");
+            }
 
             var customer = new Customer()
             {
+                id = requestCustomerDto.Id,
                 name = requestCustomerDto.Name,
                 phone = requestCustomerDto.Phone,
                 email = requestCustomerDto.Email,
                 nic = requestCustomerDto.Nic,
                 password = requestCustomerDto.Password,
-                address = requestCustomerDto.Address,
-                postalCode = requestCustomerDto.PostalCode,
-                drivingLicenseNumber = requestCustomerDto.DrivingLicenseNumber,
-                proofIdNumber = requestCustomerDto.ProofIdNumber,
-                profileStatus = requestCustomerDto.ProfileStatus
+
             };
 
+
+
+            _customerRepository.AddCustomer(customer);
+            return Ok(customer);
+        }
+
+        [HttpGet("Get-Customer-By-Nic/{nic}")]
+        public ActionResult<CustomerDTO> GetCustomerById(string nic)
+        {
+            var customer = _customerRepository.GetCustomerById(nic);
+            if (customer == null)
+            {
+                return NotFound("Customer not found.");
+            }
+            return Ok(customer);
+        }
+
+        [HttpGet("Get-All-Customer")]
+        public ActionResult<List<CustomerDTO>> GetAllCustomers()
+        {
+            var customers = _customerRepository.GetAllCustomers();
+            return Ok(customers);
+        }
+
+
+        [HttpPut("Update-Customer")]
+        public async Task<IActionResult> UpdateCustomer([FromForm] CustomerUpdateRequestDTO requestCustomerDto)
+        {
+            if (requestCustomerDto == null)
+            {
+                return BadRequest("Invalid customer data.");
+            }
+
+            var CustomerUpdateDTO = new CustomerUpdateDTO()
+            {
+                Id = requestCustomerDto.Id,
+                Address = requestCustomerDto.Address,
+                PostalCode = requestCustomerDto.PostalCode,
+                DrivingLicenseNumber = requestCustomerDto.DrivingLicenseNumber,
+                ProofIdNumber = requestCustomerDto.ProofIdNumber,
+                ProfileStatus = requestCustomerDto.ProfileStatus
+            };
             if (requestCustomerDto.FrontImagePath != null && requestCustomerDto.FrontImagePath.Length > 0)
             {
 
@@ -67,47 +106,24 @@ namespace Car_rental.Controllers
                 }
 
 
-                customer.FrontImagePath = "/LicenceFrontImages/" + fileName;
+                CustomerUpdateDTO.FrontImagePath = "/LicenceFrontImages/" + fileName;
             }
             else
             {
-                customer.FrontImagePath = null;
+                CustomerUpdateDTO.FrontImagePath = null;
             }
 
-            _customerRepository.AddCustomer(customer);
-                return Ok(customer);
-            }
+            _customerRepository.UpdateCustomer(CustomerUpdateDTO);
+            return NoContent();
 
-            [HttpGet("{nic}")]
-            public ActionResult<CustomerDTO> GetCustomerById(int nic)
-            {
-                var customer = _customerRepository.GetCustomerById(nic);
-                if (customer == null)
-                {
-                    return NotFound("Customer not found.");
-                }
-                return Ok(customer);
-            }
-
-            [HttpPut("{id}")]
-            public IActionResult UpdateCustomer(int id, [FromForm] RequestCustomerDTO requestCustomerDto)
-            {
-                if (requestCustomerDto == null)
-                {
-                    return BadRequest("Invalid customer data.");
-                }
-
-                _customerRepository.UpdateCustomer(id, requestCustomerDto);
-                return NoContent(); 
-
-            }
-
-            
-            [HttpDelete("{id}")]
-            public IActionResult DeleteCustomer(int id)
-            {
-                _customerRepository.DeleteCustomer(id);
-                return NoContent(); 
-            }
         }
+
+
+        [HttpDelete("Delete-Customer/{id}")]
+        public IActionResult DeleteCustomer(string id)
+        {
+            _customerRepository.DeleteCustomer(id);
+            return NoContent();
+        }
+    }
 }

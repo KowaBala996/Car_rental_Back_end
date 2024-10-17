@@ -32,15 +32,15 @@ namespace Car_rental
             Initialize.Initialize();
 
 
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddDefaultPolicy(policy =>
-            //    {
-            //        policy.AllowAnyOrigin()
-            //        .AllowAnyMethod()
-            //        .AllowAnyHeader();
-            //    });
-            //});
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                });
+            });
 
 
             var app = builder.Build();
@@ -51,7 +51,7 @@ namespace Car_rental
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            //app.UseCors();
+            app.UseCors();
 
             app.UseStaticFiles();
 
