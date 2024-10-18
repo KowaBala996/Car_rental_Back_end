@@ -2,7 +2,7 @@
 {
     public class AddCarDTO
     {
-        public string Id { get; set; }
+        public string CarId { get; set; }
         public string Brand { get; set; }
         public string BodyType { get; set; }
         public string Model { get; set; }

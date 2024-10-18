@@ -19,11 +19,24 @@ namespace Car_rental.Repository
         {
             using (IDbConnection db = new SqliteConnection(_connectionString))
             {
+                db.Open();
+
+                // Check if BookingId exists
+                string checkBookingSql = "SELECT COUNT(*) FROM Bookings WHERE BookingId = @BookingId";
+                var bookingExists = db.ExecuteScalar<int>(checkBookingSql, new { BookingId = rentalDetail.BookingId });
+
+                if (bookingExists == 0)
+                {
+                    throw new Exception($"Booking with ID {rentalDetail.BookingId} does not exist.");
+                }
+
+                // Proceed to insert rental detail
                 string sql = @"INSERT INTO RentalDetails (RentalId, BookingId, RentalDate, FullPayment, Status) 
-                               VALUES (@RentalId, @BookingId, @RentalDate, @FullPayment, @Status)";
+                       VALUES (@RentalId, @BookingId, @RentalDate, @FullPayment, @Status)";
                 db.Execute(sql, rentalDetail);
             }
         }
+
 
         public RentalDetail GetRentalDetailById(string rentalId)
         {

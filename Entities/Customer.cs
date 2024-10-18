@@ -2,7 +2,7 @@
 {
     public class Customer
     {
-        public string id { get; set; }
+        public string CarId { get; set; }
  
         public string name { get; set; }
         public string phone { get; set; }

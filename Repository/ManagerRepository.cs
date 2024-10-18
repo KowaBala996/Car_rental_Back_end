@@ -65,10 +65,10 @@ namespace Car_rental.Repository
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandText = @"
-                    INSERT INTO Cars (Id, Brand, BodyType, Model, Transmission, FuelType, NumberOfSeats, PricePerHour, ImagePath, AvailableFrom, AvailableTo)
+                    INSERT INTO Cars (CarId, Brand, BodyType, Model, Transmission, FuelType, NumberOfSeats, PricePerHour, ImagePath, AvailableFrom, AvailableTo)
                     VALUES (@id, @brand, @bodyType, @model, @transmission, @fuelType, @numberOfSeats, @pricePerHour, @imagePath, @availableFrom, @availableTo)";
 
-                    command.Parameters.AddWithValue("@id", carDto.Id);
+                    command.Parameters.AddWithValue("@id", carDto.CarId);
                     command.Parameters.AddWithValue("@brand", carDto.Brand);
                     command.Parameters.AddWithValue("@bodyType", carDto.BodyType);
                     command.Parameters.AddWithValue("@model", carDto.Model);

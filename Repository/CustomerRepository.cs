@@ -25,7 +25,7 @@ namespace Car_rental.Repository
             INSERT INTO Customers (Id,  Name, Phone, Email, Nic, Password) 
             VALUES (@id, @name, @phone, @email, @nic, @password )";
 
-                command.Parameters.AddWithValue("@id", requestCustomerDto.id);
+                command.Parameters.AddWithValue("@id", requestCustomerDto.CarId);
 
                 command.Parameters.AddWithValue("@name", requestCustomerDto.name);
                 command.Parameters.AddWithValue("@phone", requestCustomerDto.phone);

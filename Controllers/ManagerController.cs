@@ -41,7 +41,7 @@ namespace Car_rental.Controllers
 
             var carObj = new CarDTO()
             {
-                Id = addCarDto.Id,
+                CarId = addCarDto.CarId,
                 Brand = addCarDto.Brand,
                 BodyType = addCarDto.BodyType,
                 Model = addCarDto.Model,
