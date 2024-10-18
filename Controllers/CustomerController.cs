@@ -35,7 +35,8 @@ namespace Car_rental.Controllers
                 phone = requestCustomerDto.Phone,
                 email = requestCustomerDto.Email,
                 nic = requestCustomerDto.Nic,
-                password = requestCustomerDto.Password,
+                password = requestCustomerDto.Password
+                
 
             };
 
@@ -122,7 +123,7 @@ namespace Car_rental.Controllers
         [HttpDelete("Delete-Customer/{id}")]
         public IActionResult DeleteCustomer(string id)
         {
-            _customerRepository.DeleteCustomer(id);
+            _customerRepository.DeleteCarAndCustomers(id);
             return NoContent();
         }
     }

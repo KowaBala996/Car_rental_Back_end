@@ -22,22 +22,30 @@ namespace Car_rental.Repository
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    INSERT INTO Customers (Id,Name, Phone, Email, Nic,Password) 
-                    VALUES (@id,@name, @phone, @email, @nic,@password)";
+            INSERT INTO Customers (Id,  Name, Phone, Email, Nic, Password) 
+            VALUES (@id, @name, @phone, @email, @nic, @password )";
 
                 command.Parameters.AddWithValue("@id", requestCustomerDto.id);
+
                 command.Parameters.AddWithValue("@name", requestCustomerDto.name);
                 command.Parameters.AddWithValue("@phone", requestCustomerDto.phone);
                 command.Parameters.AddWithValue("@email", requestCustomerDto.email);
                 command.Parameters.AddWithValue("@nic", requestCustomerDto.nic);
                 command.Parameters.AddWithValue("@password", requestCustomerDto.password);
-               
 
-                command.ExecuteNonQuery();
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
             }
         }
 
-        public CustomerDTO GetCustomerById(string nic)
+
+        public CustomerDTO? GetCustomerById(string nic)
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
@@ -69,7 +77,7 @@ namespace Car_rental.Repository
                 }
             }
         }
-        public List<CustomerDTO> GetAllCustomers()
+       public List<CustomerDTO> GetAllCustomers()
         {
             var customers = new List<CustomerDTO>();
 
@@ -90,12 +98,12 @@ namespace Car_rental.Repository
                             Phone = reader.GetString(2),
                             Email = reader.GetString(3),
                             Nic = reader.GetString(4),
-                            Address = reader.GetString(5),
-                            PostalCode = reader.GetString(6),
-                            DrivingLicenseNumber = reader.GetString(7),
+                            Address = reader.IsDBNull(5) ? null : reader.GetString(5),
+                            PostalCode = reader.IsDBNull(6) ? null : reader.GetString(6),
+                            DrivingLicenseNumber = reader.IsDBNull(7) ? null : reader.GetString(7),
                             FrontImagePath = reader.IsDBNull(8) ? null : reader.GetString(8),
-                            ProofIdNumber = reader.GetString(9),
-                            ProfileStatus = reader.GetString(10)
+                            ProofIdNumber = reader.IsDBNull(9) ? null : reader.GetString(9),
+                            ProfileStatus = reader.IsDBNull(10) ? null : reader.GetString(10) // Added null check for ProfileStatus
                         };
 
                         customers.Add(customer);
@@ -105,6 +113,8 @@ namespace Car_rental.Repository
 
             return customers;
         }
+
+
 
         public void UpdateCustomer(CustomerUpdateDTO requestCustomerDto)
         {
@@ -130,17 +140,37 @@ namespace Car_rental.Repository
             }
         }
 
-        public void DeleteCustomer(string id)
+        public void DeleteCarAndCustomers(string carId)
         {
-            using (var connection = new SqliteConnection(_connectionString))
+            try
             {
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = "DELETE FROM Customers WHERE Id = @id";
-                command.Parameters.AddWithValue("@id", id);
-                command.ExecuteNonQuery();
+                using (var connection = new SqliteConnection(_connectionString))
+                {
+                    connection.Open();
+
+                    // First, delete customers referencing the car
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "DELETE FROM Customers WHERE CarId = @carId";
+                        command.Parameters.AddWithValue("@carId", carId);
+                        command.ExecuteNonQuery();
+                    }
+
+                    // Now delete the car
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "DELETE FROM Cars WHERE CarId = @id";
+                        command.Parameters.AddWithValue("@id", carId);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error deleting car and associated customers with Car ID: " + carId, ex);
             }
         }
 
-    }   
+
+    }
 }

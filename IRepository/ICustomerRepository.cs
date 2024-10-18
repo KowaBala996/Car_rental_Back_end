@@ -9,8 +9,11 @@ namespace Car_rental.IRepository
         void AddCustomer(Customer requestCustomerDto);
         CustomerDTO GetCustomerById(string nic);
         void UpdateCustomer(CustomerUpdateDTO updateDetails);
-        void DeleteCustomer(string id);
         List<CustomerDTO> GetAllCustomers();
+        void DeleteCarAndCustomers(string carId);
+
+
+
 
 
     }

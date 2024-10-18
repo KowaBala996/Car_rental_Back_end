@@ -31,7 +31,7 @@ namespace Car_rental.Repository
                         {
                             carList.Add(new CarDTO()
                             {
-                                Id = reader.GetString(0),
+                                CarId = reader.GetString(0),
                                 Brand = reader.GetString(1),
                                 BodyType = reader.GetString(2),
                                 Model = reader.GetString(3),
@@ -126,7 +126,6 @@ namespace Car_rental.Repository
             }
         }
 
-        // Delete car by ID
         public void DeleteCar(string carId)
         {
             try
@@ -134,17 +133,20 @@ namespace Car_rental.Repository
                 using (var connection = new SqliteConnection(_connectionString))
                 {
                     connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText = "DELETE FROM Cars WHERE Id = @id";
-                    command.Parameters.AddWithValue("@id", carId);
-                    command.ExecuteNonQuery();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = "DELETE FROM Cars WHERE CarId = @id";
+                        command.Parameters.AddWithValue("@id", carId);
+                        command.ExecuteNonQuery();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Error deleting car", ex);
+                throw new Exception("Error deleting car with ID: " + carId, ex);
             }
         }
+
 
     }
 }
