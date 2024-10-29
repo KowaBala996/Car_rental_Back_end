@@ -34,59 +34,67 @@ namespace Car_rental.Controllers
         [HttpPost("add-car")]
         public async Task<IActionResult> AddCar([FromForm] AddCarDTO addCarDto)
         {
-            if (addCarDto == null)
+            try
             {
-                return BadRequest("Car data is null.");
-            }
-
-            var carObj = new CarDTO()
-            {
-                CarId = addCarDto.CarId,
-                Brand = addCarDto.Brand,
-                BodyType = addCarDto.BodyType,
-                Model = addCarDto.Model,
-                Transmission = addCarDto.Transmission,
-                FuelType = addCarDto.FuelType,
-                NumberOfSeats = addCarDto.NumberOfSeats,
-                PricePerHour = addCarDto.PricePerHour,
-                AvailableFrom = addCarDto.AvailableFrom,
-                AvailableTo = addCarDto.AvailableTo
-            };
-            if (addCarDto.ImagePath != null && addCarDto.ImagePath.Length > 0)
-            {
-
-                if (string.IsNullOrEmpty(_webHostEnvironment.WebRootPath))
+                if (addCarDto == null)
                 {
-                    throw new ArgumentNullException(nameof(_webHostEnvironment.WebRootPath), "WebRootPath is not set. Make sure the environment is configured properly.");
+                    return BadRequest("Car data is null.");
                 }
 
-                var profileimagesPath = Path.Combine(_webHostEnvironment.WebRootPath, "CarImages");
-
-
-                if (!Directory.Exists(profileimagesPath))
+                var carObj = new CarDTO()
                 {
-                    Directory.CreateDirectory(profileimagesPath);
+                    CarId = addCarDto.CarId,
+                    Brand = addCarDto.Brand,
+                    BodyType = addCarDto.BodyType,
+                    Model = addCarDto.Model,
+                    Transmission = addCarDto.Transmission,
+                    FuelType = addCarDto.FuelType,
+                    NumberOfSeats = addCarDto.NumberOfSeats,
+                    PricePerHour = addCarDto.PricePerHour,
+                    AvailableFrom = addCarDto.AvailableFrom,
+                    AvailableTo = addCarDto.AvailableTo
+                };
+                if (addCarDto.ImagePath != null && addCarDto.ImagePath.Length > 0)
+                {
+
+                    if (string.IsNullOrEmpty(_webHostEnvironment.WebRootPath))
+                    {
+                        throw new ArgumentNullException(nameof(_webHostEnvironment.WebRootPath), "WebRootPath is not set. Make sure the environment is configured properly.");
+                    }
+
+                    var profileimagesPath = Path.Combine(_webHostEnvironment.WebRootPath, "CarImages");
+
+
+                    if (!Directory.Exists(profileimagesPath))
+                    {
+                        Directory.CreateDirectory(profileimagesPath);
+                    }
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(addCarDto.ImagePath.FileName);
+                    var imagePath = Path.Combine(profileimagesPath, fileName);
+
+                    using (var stream = new FileStream(imagePath, FileMode.Create))
+                    {
+                        await addCarDto.ImagePath.CopyToAsync(stream);
+                    }
+
+
+                    carObj.ImagePath = "/CarImages/" + fileName;
+                }
+                else
+                {
+                    carObj.ImagePath = null;
                 }
 
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(addCarDto.ImagePath.FileName);
-                var imagePath = Path.Combine(profileimagesPath, fileName);
 
-                using (var stream = new FileStream(imagePath, FileMode.Create))
-                {
-                    await addCarDto.ImagePath.CopyToAsync(stream);
-                }
-
-
-                carObj.ImagePath = "/CarImages/" + fileName;
+                var addedCar = _managerRepository.AddCar(carObj);
+                return Ok(addedCar);
             }
-            else
+            catch (Exception ex)
             {
-                carObj.ImagePath = null;
+                return BadRequest(ex.Message);
             }
-
-
-            var addedCar = _managerRepository.AddCar(carObj);
-            return Ok(addedCar);
+          
         }
 
         // PUT: api/manager/update-car

@@ -1,26 +1,27 @@
 ﻿using Car_rental.Entities;
 using Car_rental.IRepository;
-using System.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 
 namespace Car_rental.Repository
 {
-    public class ReturnDetailRepository: IReturnDetailRepository
+    public class ReturnDetailRepository : IReturnDetailRepository
     {
         private readonly string _connectionString;
 
-            public ReturnDetailRepository(string connectionString)
-            {
-                _connectionString = connectionString;
-            }
+        public ReturnDetailRepository(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
 
-            public void AddReturnDetail(ReturnDetail returnDetail)
+        public void AddReturnDetail(ReturnDetail returnDetail)
+        {
+            using (var connection = new SqliteConnection(_connectionString))
             {
-                using (var connection = new SqlConnection(_connectionString))
+                var query = "INSERT INTO ReturnDetails (ReturnId, RentalId, ReturnDate, Condition, LateFees) " +
+                            "VALUES (@ReturnId, @RentalId, @ReturnDate, @Condition, @LateFees)";
+
+                using (var command = new SqliteCommand(query, connection))
                 {
-                    var query = "INSERT INTO ReturnDetails (ReturnId, RentalId, ReturnDate, Condition, LateFees) " +
-                                "VALUES (@ReturnId, @RentalId, @ReturnDate, @Condition, @LateFees)";
-
-                    var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@ReturnId", returnDetail.ReturnId);
                     command.Parameters.AddWithValue("@RentalId", returnDetail.RentalId);
                     command.Parameters.AddWithValue("@ReturnDate", returnDetail.ReturnDate);
@@ -31,13 +32,15 @@ namespace Car_rental.Repository
                     command.ExecuteNonQuery();
                 }
             }
+        }
 
-            public ReturnDetail GetReturnDetailById(string returnId)
+        public ReturnDetail GetReturnDetailById(string returnId)
+        {
+            using (var connection = new SqliteConnection(_connectionString))
             {
-                using (var connection = new SqlConnection(_connectionString))
+                var query = "SELECT * FROM ReturnDetails WHERE ReturnId = @ReturnId";
+                using (var command = new SqliteCommand(query, connection))
                 {
-                    var query = "SELECT * FROM ReturnDetails WHERE ReturnId = @ReturnId";
-                    var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@ReturnId", returnId);
 
                     connection.Open();
@@ -56,46 +59,57 @@ namespace Car_rental.Repository
                         }
                     }
                 }
-                return null;
             }
+            return null;
+        }
 
-            public List<ReturnDetail> GetAllReturnDetails()
+        public List<ReturnDetail> GetAllReturnDetails()
+        {
+            var returnDetails = new List<ReturnDetail>();
+
+            using (var connection = new SqliteConnection(_connectionString))
             {
-                var returnDetails = new List<ReturnDetail>();
-
-                using (var connection = new SqlConnection(_connectionString))
+                var query = "SELECT * FROM ReturnDetails";
+                using (var command = new SqliteCommand(query, connection))
                 {
-                    var query = "SELECT * FROM ReturnDetails";
-                    var command = new SqlCommand(query, connection);
-
                     connection.Open();
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
+                            DateTime returnDate;
+                            DateTime.TryParse(reader["ReturnDate"].ToString(), out returnDate); // Try to parse, defaults to DateTime.MinValue on failure
+
+                            long lateFeesLong = (long)reader["LateFees"]; // Read as long
+                            decimal lateFees = Convert.ToDecimal(lateFeesLong); // Convert to decimal
+
                             returnDetails.Add(new ReturnDetail
                             {
                                 ReturnId = reader["ReturnId"].ToString(),
                                 RentalId = reader["RentalId"].ToString(),
-                                ReturnDate = (DateTime)reader["ReturnDate"],
+                                ReturnDate = returnDate, // Set parsed date or DateTime.MinValue
                                 Condition = reader["Condition"].ToString(),
-                                LateFees = (decimal)reader["LateFees"]
+                                LateFees = lateFees // Set the converted value
                             });
                         }
                     }
                 }
-
-                return returnDetails;
             }
 
-            public void UpdateReturnDetail(ReturnDetail returnDetail)
-            {
-                using (var connection = new SqlConnection(_connectionString))
-                {
-                    var query = "UPDATE ReturnDetails SET RentalId = @RentalId, ReturnDate = @ReturnDate, " +
-                                "Condition = @Condition, LateFees = @LateFees WHERE ReturnId = @ReturnId";
+            return returnDetails;
+        }
 
-                    var command = new SqlCommand(query, connection);
+
+
+        public void UpdateReturnDetail(ReturnDetail returnDetail)
+        {
+            using (var connection = new SqliteConnection(_connectionString))
+            {
+                var query = "UPDATE ReturnDetails SET RentalId = @RentalId, ReturnDate = @ReturnDate, " +
+                            "Condition = @Condition, LateFees = @LateFees WHERE ReturnId = @ReturnId";
+
+                using (var command = new SqliteCommand(query, connection))
+                {
                     command.Parameters.AddWithValue("@ReturnId", returnDetail.ReturnId);
                     command.Parameters.AddWithValue("@RentalId", returnDetail.RentalId);
                     command.Parameters.AddWithValue("@ReturnDate", returnDetail.ReturnDate);
@@ -106,18 +120,21 @@ namespace Car_rental.Repository
                     command.ExecuteNonQuery();
                 }
             }
+        }
 
-            public void DeleteReturnDetail(string returnId)
+        public void DeleteReturnDetail(string returnId)
+        {
+            using (var connection = new SqliteConnection(_connectionString))
             {
-                using (var connection = new SqlConnection(_connectionString))
+                var query = "DELETE FROM ReturnDetails WHERE ReturnId = @ReturnId";
+                using (var command = new SqliteCommand(query, connection))
                 {
-                    var query = "DELETE FROM ReturnDetails WHERE ReturnId = @ReturnId";
-                    var command = new SqlCommand(query, connection);
                     command.Parameters.AddWithValue("@ReturnId", returnId);
 
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
             }
+        }
     }
 }

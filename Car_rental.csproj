@@ -15,6 +15,8 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\CarImages\" />
+    <Folder Include="wwwroot\LicenceFrontImages\" />
   </ItemGroup>
 
 </Project>

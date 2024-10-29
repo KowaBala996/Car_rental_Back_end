@@ -13,6 +13,6 @@
         public string? ImagePath { get; set; }
         public DateTime AvailableFrom { get; set; }
         public DateTime AvailableTo { get; set; }
-        public string Id { get; internal set; }
+        public string Id { get;  set; }
     }
 }

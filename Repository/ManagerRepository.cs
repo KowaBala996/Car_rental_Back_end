@@ -100,12 +100,13 @@ namespace Car_rental.Repository
                     connection.Open();
                     var command = connection.CreateCommand();
                     command.CommandText = @"
-                    UPDATE Cars
-                    SET Brand = @brand, BodyType = @bodyType, Model = @model, Transmission = @transmission, FuelType = @fuelType, 
-                        NumberOfSeats = @numberOfSeats, PricePerHour = @pricePerHour, ImagePath = @imagePath, AvailableFrom = @availableFrom, AvailableTo = @availableTo
-                    WHERE Id = @id";
+                UPDATE Cars
+                SET Brand = @brand, BodyType = @bodyType, Model = @model, Transmission = @transmission, 
+                    FuelType = @fuelType, NumberOfSeats = @numberOfSeats, PricePerHour = @pricePerHour, 
+                    ImagePath = @imagePath, AvailableFrom = @availableFrom, AvailableTo = @availableTo
+                WHERE CarId = @carId";  // Updated from 'Id' to 'CarId'
 
-                    command.Parameters.AddWithValue("@id", car.Id);
+                    command.Parameters.AddWithValue("@carId", car.CarId);  // Updated parameter name
                     command.Parameters.AddWithValue("@brand", car.Brand);
                     command.Parameters.AddWithValue("@bodyType", car.BodyType);
                     command.Parameters.AddWithValue("@model", car.Model);
@@ -125,6 +126,7 @@ namespace Car_rental.Repository
                 throw new Exception("Error updating car", ex);
             }
         }
+
 
         public void DeleteCar(string carId)
         {

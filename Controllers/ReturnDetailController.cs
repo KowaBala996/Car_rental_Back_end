@@ -1,80 +1,80 @@
 ﻿using Car_rental.Entities;
 using Car_rental.IRepository;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace Car_rental.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class ReturnDetailController : Controller
+    [ApiController]
+    public class ReturnDetailController : ControllerBase
     {
-            private readonly IReturnDetailRepository _returnDetailRepository;
+        private readonly IReturnDetailRepository _returnDetailRepository;
 
-            public ReturnDetailController(IReturnDetailRepository returnDetailRepository)
+        public ReturnDetailController(IReturnDetailRepository returnDetailRepository)
+        {
+            _returnDetailRepository = returnDetailRepository;
+        }
+
+        [HttpGet]
+        public ActionResult<List<ReturnDetail>> GetAllReturnDetails()
+        {
+            var returnDetails = _returnDetailRepository.GetAllReturnDetails();
+            return Ok(returnDetails);
+        }
+
+        [HttpGet("{returnId}")]
+        public ActionResult<ReturnDetail> GetReturnDetail(string returnId)
+        {
+            var returnDetail = _returnDetailRepository.GetReturnDetailById(returnId);
+            if (returnDetail == null)
             {
-                _returnDetailRepository = returnDetailRepository;
+                return NotFound();
+            }
+            return Ok(returnDetail);
+        }
+
+        [HttpPost]
+        public ActionResult AddReturnDetail([FromBody] ReturnDetail returnDetail)
+        {
+            if (returnDetail == null)
+            {
+                return BadRequest("Return detail is null.");
             }
 
-            [HttpPost]
-            public IActionResult AddReturnDetail([FromForm] ReturnDetail returnDetail)
-            {
-                if (returnDetail == null)
-                {
-                    return BadRequest("Return detail cannot be null.");
-                }
+            _returnDetailRepository.AddReturnDetail(returnDetail);
+            return CreatedAtAction(nameof(GetReturnDetail), new { returnId = returnDetail.ReturnId }, returnDetail);
+        }
 
-                _returnDetailRepository.AddReturnDetail(returnDetail);
-                return CreatedAtAction(nameof(GetReturnDetailById), new { id = returnDetail.ReturnId }, returnDetail);
+        [HttpPut("{returnId}")]
+        public ActionResult UpdateReturnDetail(string returnId, [FromBody] ReturnDetail returnDetail)
+        {
+            if (returnDetail == null || returnId != returnDetail.ReturnId)
+            {
+                return BadRequest("Return detail is null or ID mismatch.");
             }
 
-            [HttpGet("{id}")]
-            public IActionResult GetReturnDetailById(string id)
+            var existingDetail = _returnDetailRepository.GetReturnDetailById(returnId);
+            if (existingDetail == null)
             {
-                var returnDetail = _returnDetailRepository.GetReturnDetailById(id);
-                if (returnDetail == null)
-                {
-                    return NotFound("Return detail not found.");
-                }
-
-                return Ok(returnDetail);
+                return NotFound();
             }
 
-            [HttpGet]
-            public IActionResult GetAllReturnDetails()
+            _returnDetailRepository.UpdateReturnDetail(returnDetail);
+            return NoContent();
+        }
+
+        [HttpDelete("{returnId}")]
+        public ActionResult DeleteReturnDetail(string returnId)
+        {
+            var existingDetail = _returnDetailRepository.GetReturnDetailById(returnId);
+            if (existingDetail == null)
             {
-                var returnDetails = _returnDetailRepository.GetAllReturnDetails();
-                return Ok(returnDetails);
+                return NotFound();
             }
 
-            [HttpPut("{id}")]
-            public IActionResult UpdateReturnDetail(string id, [FromForm] ReturnDetail returnDetail)
-            {
-                if (id != returnDetail.ReturnId)
-                {
-                    return BadRequest("Return ID mismatch.");
-                }
-
-                var existingReturnDetail = _returnDetailRepository.GetReturnDetailById(id);
-                if (existingReturnDetail == null)
-                {
-                    return NotFound("Return detail not found.");
-                }
-
-                _returnDetailRepository.UpdateReturnDetail(returnDetail);
-                return NoContent();
-            }
-
-            [HttpDelete("{id}")]
-            public IActionResult DeleteReturnDetail(string id)
-            {
-                var existingReturnDetail = _returnDetailRepository.GetReturnDetailById(id);
-                if (existingReturnDetail == null)
-                {
-                    return NotFound("Return detail not found.");
-                }
-
-                _returnDetailRepository.DeleteReturnDetail(id);
-                return NoContent();
-            }
+            _returnDetailRepository.DeleteReturnDetail(returnId);
+            return NoContent();
+        }
     }
 }

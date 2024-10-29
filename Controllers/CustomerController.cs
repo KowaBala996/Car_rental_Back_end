@@ -21,7 +21,7 @@ namespace Car_rental.Controllers
         }
 
         [HttpPost("Add-Customer")]
-        public async Task<IActionResult> AddCustomer([FromBody] RequestCustomerDTO requestCustomerDto)
+        public async Task<IActionResult> AddCustomer([FromForm] RequestCustomerDTO requestCustomerDto)
         {
             if (requestCustomerDto == null)
             {
@@ -30,13 +30,14 @@ namespace Car_rental.Controllers
 
             var customer = new Customer()
             {
-                CarId = requestCustomerDto.Id,
+                Id = requestCustomerDto.Id,
                 name = requestCustomerDto.Name,
                 phone = requestCustomerDto.Phone,
                 email = requestCustomerDto.Email,
                 nic = requestCustomerDto.Nic,
-                password = requestCustomerDto.Password
-                
+                password = requestCustomerDto.Password,
+                carId = requestCustomerDto.CarId
+
 
             };
 
