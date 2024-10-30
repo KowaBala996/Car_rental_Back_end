@@ -34,8 +34,8 @@ namespace Car_rental.Controllers
             return Ok(returnDetail);
         }
 
-        [HttpPost]
-        public ActionResult AddReturnDetail([FromBody] ReturnDetail returnDetail)
+        [HttpPost("Add-ReturnDetail")]
+        public ActionResult AddReturnDetail([FromForm] ReturnDetail returnDetail)
         {
             if (returnDetail == null)
             {
